@@ -17,6 +17,7 @@ function action(input, output, filename)
 		run("Set Measurements...", "  mean standard redirect=None decimal=3");
 		run("Measure");
 
+		mean = getResult("Mean", 0);
 		std = getResult("StdDev", 0);
 
 		setAutoThreshold("Default");
