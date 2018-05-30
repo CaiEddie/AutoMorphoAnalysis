@@ -24,6 +24,8 @@ function action(input, output, filename)
 	// Figures out if the image is phase-light or phase-dark using the mean 
 
 		if (mean > 155) { 		// if the image is phase-inverted or is early cells
+
+			waitForUser("Wait", "Is this image phase-dark?");
 		
 			// Sets the threshold to keep only the top and bottom 15%
 
@@ -39,30 +41,6 @@ function action(input, output, filename)
 				run("Fill Holes");
 				run("Gray Morphology", "radius=5 type=circle operator=erode");
 				run("Gray Morphology", "radius=2 type=circle operator=close");
-
-
-			// Finds very large shapes that are not too circular and displays it
-
-				run("Analyze Particles...", "size=3000-Infinity circularity=0.00-0.70 show=Outlines display clear summarize add");
-				selectWindow("duplicate");
-				close();
-
-			// Adds the Regions of Interest back into the original picture and saves it in new directory
-
-				selectWindow(filename);
-				roiManager("Set Line Width", 3);
-				run("From ROI Manager");
-				saveAs("Jpeg", output + filename + "_" + "result");
-					
-			// Closes everything
-				
-				run("Close All");
-				selectWindow("Results");
-				run("Close");
-				selectWindow("Summary");
-				run("Close");
-				selectWindow("ROI Manager");
-				run("Close");
 
 
 		}	else {							// if the image is normal
@@ -82,30 +60,31 @@ function action(input, output, filename)
 				run("Gray Morphology", "radius=5 type=circle operator=erode");
 				run("Gray Morphology", "radius=2 type=circle operator=close");
 
-
-			// Finds very large shapes that are not too circular and displays it
-
-				run("Analyze Particles...", "size=3000-Infinity circularity=0.00-0.70 show=Outlines display clear summarize add");
-				selectWindow("duplicate");
-				close();
-
-			// Adds the Regions of Interest back into the original picture and saves it in new directory
-
-				selectWindow(filename);
-				roiManager("Set Line Width", 3);
-				run("From ROI Manager");
-				saveAs("Jpeg", output + filename + "_" + "result");
-					
-			// Closes everything
-				
-				run("Close All");
-				selectWindow("Results");
-				run("Close");
-				selectWindow("Summary");
-				run("Close");
-				selectWindow("ROI Manager");
-				run("Close");
 		}
+
+		// Finds very large shapes that are not too circular and displays it
+			run("Set Measurements...", "area centroid perimeter shape redirect=None decimal=3");
+			run("Analyze Particles...", "size=3000-Infinity circularity=0.00-0.70 show=Outlines display exclude clear summarize add");
+			selectWindow("duplicate");
+			close();
+
+		// Adds the Regions of Interest back into the original picture and saves it in new directory
+
+			selectWindow(filename);
+			roiManager("Set Line Width", 3);
+			run("From ROI Manager");
+			saveAs("Jpeg", output + filename + "_" + "output.jpg");
+					
+		// Closes everything
+				
+			run("Close All");
+			selectWindow("Results");
+			saveAs("Results", output + filename + "_" + "particle_data.csv");
+			run("Close");
+			selectWindow("Summary");
+			run("Close");
+			selectWindow("ROI Manager");
+			run("Close");
 }
 
 input = getDirectory("Choose Input Directory")
