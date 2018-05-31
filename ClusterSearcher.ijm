@@ -12,10 +12,11 @@ function action(input, output, filename)
 		run("Duplicate...", "title=duplicate");
 		selectWindow("duplicate");
 
-	// Measures the mean and standard deviation of the value
+	// Measures the mean and standard deviation of the value and saves the general image data to a csv
 
-		run("Set Measurements...", "  mean standard redirect=None decimal=3");
+		run("Set Measurements...", "mean standard min bounding redirect=None decimal=3");
 		run("Measure");
+		saveAs("Measurements", output + "measure_data_" + i + ".csv");
 
 		mean = getResult("Mean", 0);
 		std = getResult("StdDev", 0);
@@ -64,7 +65,7 @@ function action(input, output, filename)
 
 		// Finds very large shapes that are not too circular and displays it
 			run("Set Measurements...", "area centroid perimeter shape redirect=None decimal=3");
-			run("Analyze Particles...", "size=3000-Infinity circularity=0.00-0.70 show=Outlines display exclude clear summarize add");
+			run("Analyze Particles...", "size=3000-Infinity circularity=0.00-0.70 show=Outlines display clear summarize add");
 			selectWindow("duplicate");
 			close();
 
@@ -73,13 +74,13 @@ function action(input, output, filename)
 			selectWindow(filename);
 			roiManager("Set Line Width", 3);
 			run("From ROI Manager");
-			saveAs("Jpeg", output + filename + "_" + "output.jpg");
+			saveAs("Jpeg", output + "output_" + i + ".jpg");
 					
-		// Closes everything
+		// Closes everything and saves the particle data file
 				
 			run("Close All");
 			selectWindow("Results");
-			saveAs("Results", output + filename + "_" + "particle_data.csv");
+			saveAs("Results", output + "particle_data_" + i + ".csv");
 			run("Close");
 			selectWindow("Summary");
 			run("Close");
