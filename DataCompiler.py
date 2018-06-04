@@ -14,10 +14,7 @@ def findMiddleThree( image, particles ):
 
 	first, second, third = {}, {}, {}
 
-	# because particles is an iterator we can't index it
-
 	for part in particles:
-
 		part['centerDistance'] = math.sqrt((Cx - float(part['X']))**2 + (Cy - float(part['Y'])) **2)
 
 		if part['centerDistance'] < (first.get('centerDistance') or sys.maxsize):
@@ -32,12 +29,13 @@ def findMiddleThree( image, particles ):
 
 	return first, second, third
 
-def calculateDistance( reference, particles ):
+def calculateDistance( ref, particles ):
 	"This calculates the distance between the reference cluster and all others, returning a list of distances"
 
 	distances = []
 	for part in particles:
-		distances.append( math.sqrt((float(reference['X']) - float(part['X']))**2 + (float(reference['Y']) - float(part['Y'])) **2) )
+		distance =  math.sqrt((float(ref['X']) - float(part['X']))**2 + (float(ref['Y']) - float(part['Y'])) **2) 
+		distances.append(distance)
 
 	return distances
 
@@ -63,7 +61,15 @@ while os.path.isfile(directory + "/particle_data_" + str(i) + ".csv"):
 	#	'Area' 'X' 'Y' 'Perim.'	'Circ' 'AR'	'Round'	'Solidity'
 	
 	with open(directory + "/particle_data_" + str(i) + ".csv", 'rb') as pfile:
-		particles = csv.DictReader(pfile, delimiter=',')
+		buf = csv.DictReader(pfile, delimiter=',')
+
+		# writing all of the particle data into dictionary list "particles"
+
+		particles = []
+		count = 0
+		for row in buf:
+			particles.append(row)
+			count += 1
 
 		references = findMiddleThree(image, particles)
 
