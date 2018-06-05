@@ -29,6 +29,18 @@ def findMiddleThree( image, particles ):
 
 	return first, second, third
 
+def findCroppedReferences( image, particles, width, height):
+	"This locates all the clusters in a box cropped by width and height"
+
+	references = []
+
+	for part in particles:
+		if (float(part['X']) > width or float(part['X']) < float(image['Width']) - width):
+			if (float(part['Y']) > height or float(part['Y']) < float(image['Height']) - height):
+				references.append(part)
+
+	return references
+
 def calculateDistance( ref, particles ):
 	"This calculates the distance between the reference cluster and all others, returning a list of distances"
 
