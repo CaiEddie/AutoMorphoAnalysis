@@ -2,9 +2,6 @@ import csv
 import os.path
 import math
 import sys
-from Tkinter import Tk
-from tkFileDialog import askdirectory
-
 
 def findMiddleThree( image, particles ):
 	"This locates the three clusters closest to the middle of the image"
@@ -53,10 +50,10 @@ def calculateDistance( ref, particles ):
 	return distances
 
 
-#  Asks for the directory of the data
-Tk().withdraw() 
-directory = askdirectory()
-open('output.csv', 'w')
+#  Takes the directory from the macro 
+directory = getArgument()
+f = open(directory + "/output.csv", 'w')
+f.close()
 i = 0
 
 #  Loops through the csv files (with precise naming) if they exist 
@@ -71,6 +68,7 @@ while os.path.isfile(directory + "/particle_data_" + str(i) + ".csv"):
 		for index in reader:
 			image = index
 
+	os.remove(directory + "/measure_data_" + str(i) + ".csv")
 	# opens the particle data file and adds the information to the 'particles' dictionary table  
 	#	'Area' 'X' 'Y' 'Perim.'	'Circ' 'AR'	'Round'	'Solidity'
 	
@@ -100,7 +98,10 @@ while os.path.isfile(directory + "/particle_data_" + str(i) + ".csv"):
 		for item in edgeClusters:
 			item['Include'] = True
 
-	with open('output.csv', 'a') as csvfile:
+	os.remove(directory + "/particle_data_" + str(i) + ".csv")
+
+	with open(directory + "/output.csv", 'a') as csvfile:
+		
 		fieldnames = ['Image', 'Area', 'X', 'Y', 'Solidity', 'Circ.', 'Round', 'Perim.', 'Include', 'Distances']
 		writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', lineterminator = '\n')
 		if i == 0:
@@ -109,8 +110,4 @@ while os.path.isfile(directory + "/particle_data_" + str(i) + ".csv"):
 			writer.writerow(item)
 
 	i += 1
-
-
-	
-
 

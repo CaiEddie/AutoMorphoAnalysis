@@ -86,8 +86,9 @@ function action(input, output, filename)
 			run("Close");
 }
 
-input = getDirectory("Choose Input Directory")
-output = getDirectory("Choose Output Directory")
+input = getDirectory("Choose Input Directory");
+
+output = File.getParent(getInfo("macro.filepath")) + "/results/"
 
 setBatchMode(true);
 list = getFileList(input);
@@ -97,5 +98,10 @@ for (i = 0; i < list.length; i++)
 }
 
 setBatchMode(false);
+
+// runs the python script
+
+jythonText = File.openAsString(File.getParent(getInfo("macro.filepath")) + "/DataCompiler.py"); 
+call("ij.plugin.Macro_Runner.runPython", jythonText, output); 
 
 waitForUser("Finished!", "Analysis Complete!");
