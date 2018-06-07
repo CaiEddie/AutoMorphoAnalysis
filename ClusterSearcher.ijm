@@ -91,12 +91,13 @@ function action(input, output, filename)
 input = getDirectory("Choose Input Directory")
 output = getDirectory("Choose Output Directory")
 
-//setBatchMode(true);
+setBatchMode(true);
 list = getFileList(input);
 for (i = 0; i < list.length; i++)
 {
 	action(input, output, list[i]);
 }
+
 setBatchMode(false);
 
 waitForUser("Finished!", "Analysis Complete!");

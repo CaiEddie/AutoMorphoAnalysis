@@ -29,17 +29,17 @@ def findMiddleThree( image, particles ):
 
 	return first, second, third
 
-def findCroppedReferences( image, particles, width, height):
+def findCroppedClusters( image, particles, width, height):
 	"This locates all the clusters in a box cropped by width and height"
 
-	references = []
+	clusters = []
 
 	for part in particles:
-		if (float(part['X']) > width or float(part['X']) < float(image['Width']) - width):
-			if (float(part['Y']) > height or float(part['Y']) < float(image['Height']) - height):
-				references.append(part)
+		if (float(part['X']) > width and float(part['X']) < float(image['Width']) - width):
+			if (float(part['Y']) > height and float(part['Y']) < float(image['Height']) - height):
+				clusters.append(part)
 
-	return references
+	return clusters
 
 def calculateDistance( ref, particles ):
 	"This calculates the distance between the reference cluster and all others, returning a list of distances"
@@ -55,11 +55,12 @@ def calculateDistance( ref, particles ):
 #  Asks for the directory of the data
 Tk().withdraw() 
 directory = askdirectory()
-
+open('output.csv', 'w')
 i = 0
 
 #  Loops through the csv files (with precise naming) if they exist 
 while os.path.isfile(directory + "/particle_data_" + str(i) + ".csv"):
+
 
 	# opens the measurement data file and adds the information to the 'image' dictionary 
 	#	'Mean' 'StdDev'	'Min' 'Max'	'Witdh'	'Height'
@@ -83,12 +84,32 @@ while os.path.isfile(directory + "/particle_data_" + str(i) + ".csv"):
 			particles.append(row)
 			count += 1
 
+		for item in particles:
+			item['Image'] = i
+
 		references = findMiddleThree(image, particles)
 
 		for ref in references:
-			print(calculateDistance(ref, particles))
+			ref['Distances'] = calculateDistance(ref, particles)
+
+		# marks the clusters that are near the edge
+
+		edgeClusters = findCroppedClusters(image, particles, 100, 100)
+
+		for item in edgeClusters:
+			item['Include'] = True
+
+	with open('output.csv', 'a') as csvfile:
+		fieldnames = ['Image', 'Area', 'X', 'Y', 'Solidity', 'Circ.', 'Round', 'Perim.', 'Include', 'Distances']
+		writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', lineterminator = '\n')
+		if i == 0:
+			writer.writeheader()
+		for item in particles:
+			writer.writerow(item)
 
 	i += 1
 
+
+	
 
 
