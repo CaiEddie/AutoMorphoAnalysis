@@ -46,8 +46,9 @@ def calculateDistance( ref, particles ):
 
 	distances = []
 	for part in particles:
-		distance =  math.sqrt((float(ref['X']) - float(part['X']))**2 + (float(ref['Y']) - float(part['Y'])) **2) 
-		distances.append(distance)
+		if part != ref: 
+			distance =  math.sqrt((float(ref['X']) - float(part['X']))**2 + (float(ref['Y']) - float(part['Y'])) **2) 
+			distances.append(distance)
 
 	return distances
 
