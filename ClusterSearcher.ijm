@@ -84,8 +84,6 @@ function action(input, output, filename)
 			run("Close");
 			selectWindow("Summary");
 			run("Close");
-			selectWindow("ROI Manager");
-			run("Close");
 }
 
 input = getDirectory("Choose Input Directory")
