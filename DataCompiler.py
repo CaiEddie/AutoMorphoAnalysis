@@ -72,7 +72,7 @@ while os.path.isdir(directory + chr(ord('A')+i)):
 			for index in reader:
 				image = index
 
-		os.remove(di+ "/measure_data_" + str(j) + ".csv")
+#		os.remove(di+ "/measure_data_" + str(j) + ".csv")
 		# opens the particle data file and adds the information to the 'particles' dictionary table  
 		#	'Area' 'X' 'Y' 'Perim.'	'Circ' 'AR'	'Round'	'Solidity'
 		
@@ -89,13 +89,16 @@ while os.path.isdir(directory + chr(ord('A')+i)):
 
 			for item in particles:
 				item['Image'] = j
-				item['Cell Line'] = i
+				item['Cell Line'] = chr(ord('A')+i)
 
 			references = findMiddleThree(image, particles)
 
 			for ref in references:
 				if ref:
-					ref['Distances'] = calculateDistance(ref, particles)
+					distances = calculateDistance(ref, particles)
+					ref['Distances'] = distances
+					if len(distances) > 0:
+						ref['Average Distance'] = sum(distances) / len(distances)
 
 			# marks the clusters that are near the edge
 
@@ -104,16 +107,50 @@ while os.path.isdir(directory + chr(ord('A')+i)):
 			for item in edgeClusters:
 				item['Include'] = True
 
-		os.remove(di+ "/particle_data_" + str(j) + ".csv")
+#		os.remove(di+ "/particle_data_" + str(j) + ".csv")
 
-		with open(directory + "/output.csv", 'a') as csvfile:
+		with open(di + "/output.csv", 'a') as csvfile:
 			
-			fieldnames = ['Cell Line', 'Image', 'Area', 'X', 'Y', 'Solidity', 'Circ.', 'Round', 'Perim.', 'Include', 'Distances']
+			fieldnames = ['Cell Line', 'Image', 'Area', 'X', 'Y', 'Solidity', 'Circ.', 'Round', 'Perim.', 'Include', 'Average Distance']
 			writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', lineterminator = '\n')
-			if j == 0:
+			if os.path.getsize(di + "/output.csv") < 1:
 				writer.writeheader()
 			for item in particles:
 				writer.writerow(item)
 
 		j += 1
+
+	with open(di + "/output.csv", 'rb') as ofile:
+		
+		buf = csv.DictReader(ofile, delimiter=',')
+		particles = []
+		for row in buf:
+			particles.append(row)
+
+
+	line = {}
+	total_size = 0
+	total_distance = 0
+	line['Num. particles'] = len(particles)
+	count = 0
+
+	for item in particles:
+		if 'Include' in item:
+			total_size = total_size + int(item['Area']) 
+		if item['Average Distance']:
+			total_distance = total_distance + float(item['Average Distance'])
+			count = count + 1
+
+	line['Cell Line'] = chr(ord('A')+i)
+	line['Ave. Size'] = total_size / len(particles)
+	line['Ave. Distance'] = total_distance / count
+
+	with open(directory + "/output.csv", 'a') as csvfile:
+			
+			fieldnames = ['Cell Line', 'Num. particles', 'Ave. Size', 'Ave. Distance']
+			writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', lineterminator = '\n')
+			if os.path.getsize(directory + "/output.csv") < 1:
+				writer.writeheader()
+			writer.writerow(line)
+
 	i += 1
