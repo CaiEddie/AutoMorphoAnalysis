@@ -3,7 +3,7 @@
 
 function action(input, output, filename)
 {	
-		open(input + filename);
+		open(input + filename + "/POINT 00001/BRIGHT/00000.TIFF");
 		setOption("BlackBackground", true);
 		run("8-bit");
 
@@ -26,13 +26,13 @@ function action(input, output, filename)
 
 		if (mean > 155) { 		// if the image is phase-inverted or is early cells
 
-			waitForUser("Wait", "Is this image phase-dark?");
+			// waitForUser("Wait", "Is this image phase-dark?");
 		
 			// Sets the threshold to keep only the top and bottom 15%
 
 				setAutoThreshold("Default");
 				//run("Threshold...");
-				setThreshold(mean-2*std, mean+2*std, "black & white");
+				setThreshold(mean-2*std-2, mean+2*std+2, "black & white");
 				run("Convert to Mask");
 				run("Invert");
 
@@ -40,7 +40,7 @@ function action(input, output, filename)
 
 				run("Gray Morphology", "radius=3 type=circle operator=close");
 				run("Fill Holes");
-				run("Gray Morphology", "radius=5 type=circle operator=erode");
+				run("Gray Morphology", "radius=8 type=circle operator=erode");
 				run("Gray Morphology", "radius=2 type=circle operator=close");
 
 
@@ -50,7 +50,7 @@ function action(input, output, filename)
 
 				setAutoThreshold("Default");
 				//run("Threshold...");
-				setThreshold(mean-2*std, mean+2*std, "black & white");
+				setThreshold(mean-2*std-2, mean+2*std+2, "black & white");
 				run("Convert to Mask");
 				run("Invert");
 
@@ -58,22 +58,24 @@ function action(input, output, filename)
 
 				run("Gray Morphology", "radius=3 type=circle operator=close");
 				run("Fill Holes");
-				run("Gray Morphology", "radius=5 type=circle operator=erode");
+				run("Gray Morphology", "radius=7 type=circle operator=erode");
 				run("Gray Morphology", "radius=2 type=circle operator=close");
 
 		}
 
 		// Finds very large shapes that are not too circular and displays it
 			run("Set Measurements...", "area centroid perimeter shape redirect=None decimal=3");
-			run("Analyze Particles...", "size=3000-Infinity circularity=0.00-0.70 show=Outlines display clear summarize add");
+			run("Analyze Particles...", "size=3100-Infinity circularity=0-0.70 show=Outlines display clear summarize add");
 			selectWindow("duplicate");
 			close();
 
 		// Adds the Regions of Interest back into the original picture and saves it in new directory
 
-			selectWindow(filename);
-			roiManager("Set Line Width", 3);
-			run("From ROI Manager");
+			selectWindow("00000.TIFF");
+			if (roiManager("count") > 0) {
+				roiManager("Set Line Width", 3);
+				run("From ROI Manager");
+			}
 			saveAs("Jpeg", output + "output_" + i + ".jpg");
 					
 		// Closes everything and saves the particle data file
@@ -84,20 +86,20 @@ function action(input, output, filename)
 			run("Close");
 			selectWindow("Summary");
 			run("Close");
+			selectWindow("ROI Manager");
+			run("Close");
 }
 
 input = getDirectory("Choose Input Directory");
 
 output = File.getParent(getInfo("macro.filepath")) + "/results/"
 
-setBatchMode(true);
+//setBatchMode(true);
 list = getFileList(input);
 for (i = 0; i < list.length; i++)
 {
 	action(input, output, list[i]);
 }
-
-setBatchMode(false);
 
 // runs the python script
 

@@ -89,7 +89,8 @@ while os.path.isfile(directory + "/particle_data_" + str(i) + ".csv"):
 		references = findMiddleThree(image, particles)
 
 		for ref in references:
-			ref['Distances'] = calculateDistance(ref, particles)
+			if ref:
+				ref['Distances'] = calculateDistance(ref, particles)
 
 		# marks the clusters that are near the edge
 
