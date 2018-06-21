@@ -3,7 +3,7 @@
 
 function action(input, output, filename)
 {	
-		open(input + filename + "/POINT 00001/BRIGHT/00000.TIFF");
+		open(input + filename);
 		setOption("BlackBackground", true);
 		run("8-bit");
 
@@ -40,7 +40,7 @@ function action(input, output, filename)
 
 				run("Gray Morphology", "radius=3 type=circle operator=close");
 				run("Fill Holes");
-				run("Gray Morphology", "radius=8 type=circle operator=erode");
+				run("Gray Morphology", "radius=7 type=circle operator=erode");
 				run("Gray Morphology", "radius=2 type=circle operator=close");
 
 
@@ -71,7 +71,7 @@ function action(input, output, filename)
 
 		// Adds the Regions of Interest back into the original picture and saves it in new directory
 
-			selectWindow("00000.TIFF");
+			selectWindow(filename);
 			if (roiManager("count") > 0) {
 				roiManager("Set Line Width", 3);
 				run("From ROI Manager");
@@ -94,11 +94,19 @@ input = getDirectory("Choose Input Directory");
 
 output = File.getParent(getInfo("macro.filepath")) + "/results/"
 
-//setBatchMode(true);
 list = getFileList(input);
 for (i = 0; i < list.length; i++)
 {
-	action(input, output, list[i]);
+	list2 = getFileList(input + list[i]);
+	for (j = 0; j < list2.length; j++)
+	{
+		if ( !File.exists(output + "/" + substring(list[i], 0, 1))) 
+		{
+			File.makeDirectory(output + "/" + substring(list[i], 0, 1));
+		}
+
+		action(input + list[i] + list2[j] + "BRIGHT/", output + substring(list[i], 0, 1) + "/", "00000.TIFF");
+	}
 }
 
 // runs the python script

@@ -55,60 +55,65 @@ directory = getArgument()
 f = open(directory + "/output.csv", 'w')
 f.close()
 i = 0
+j = 0
 
 #  Loops through the csv files (with precise naming) if they exist 
-while os.path.isfile(directory + "/particle_data_" + str(i) + ".csv"):
+
+while os.path.isdir(directory + chr(ord('A')+i)):
+	di = directory + chr(ord('A')+i)
+	while os.path.isfile(di+ "/particle_data_" + str(j) + ".csv"):
 
 
-	# opens the measurement data file and adds the information to the 'image' dictionary 
-	#	'Mean' 'StdDev'	'Min' 'Max'	'Witdh'	'Height'
+		# opens the measurement data file and adds the information to the 'image' dictionary 
+		#	'Mean' 'StdDev'	'Min' 'Max'	'Witdh'	'Height'
 
-	with open(directory + "/measure_data_" + str(i) + ".csv") as mfile:
-		reader = csv.DictReader(mfile, delimiter=',')
-		for index in reader:
-			image = index
+		with open(di + "/measure_data_" + str(j) + ".csv") as mfile:
+			reader = csv.DictReader(mfile, delimiter=',')
+			for index in reader:
+				image = index
 
-	os.remove(directory + "/measure_data_" + str(i) + ".csv")
-	# opens the particle data file and adds the information to the 'particles' dictionary table  
-	#	'Area' 'X' 'Y' 'Perim.'	'Circ' 'AR'	'Round'	'Solidity'
-	
-	with open(directory + "/particle_data_" + str(i) + ".csv", 'rb') as pfile:
-		buf = csv.DictReader(pfile, delimiter=',')
-
-		# writing all of the particle data into dictionary list "particles"
-
-		particles = []
-		count = 0
-		for row in buf:
-			particles.append(row)
-			count += 1
-
-		for item in particles:
-			item['Image'] = i
-
-		references = findMiddleThree(image, particles)
-
-		for ref in references:
-			if ref:
-				ref['Distances'] = calculateDistance(ref, particles)
-
-		# marks the clusters that are near the edge
-
-		edgeClusters = findCroppedClusters(image, particles, 100, 100)
-
-		for item in edgeClusters:
-			item['Include'] = True
-
-	os.remove(directory + "/particle_data_" + str(i) + ".csv")
-
-	with open(directory + "/output.csv", 'a') as csvfile:
+		os.remove(di+ "/measure_data_" + str(j) + ".csv")
+		# opens the particle data file and adds the information to the 'particles' dictionary table  
+		#	'Area' 'X' 'Y' 'Perim.'	'Circ' 'AR'	'Round'	'Solidity'
 		
-		fieldnames = ['Image', 'Area', 'X', 'Y', 'Solidity', 'Circ.', 'Round', 'Perim.', 'Include', 'Distances']
-		writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', lineterminator = '\n')
-		if i == 0:
-			writer.writeheader()
-		for item in particles:
-			writer.writerow(item)
+		with open(di + "/particle_data_" + str(j) + ".csv", 'rb') as pfile:
+			buf = csv.DictReader(pfile, delimiter=',')
 
+			# writing all of the particle data into dictionary list "particles"
+
+			particles = []
+			count = 0
+			for row in buf:
+				particles.append(row)
+				count += 1
+
+			for item in particles:
+				item['Image'] = j
+				item['Cell Line'] = i
+
+			references = findMiddleThree(image, particles)
+
+			for ref in references:
+				if ref:
+					ref['Distances'] = calculateDistance(ref, particles)
+
+			# marks the clusters that are near the edge
+
+			edgeClusters = findCroppedClusters(image, particles, 100, 100)
+
+			for item in edgeClusters:
+				item['Include'] = True
+
+		os.remove(di+ "/particle_data_" + str(j) + ".csv")
+
+		with open(directory + "/output.csv", 'a') as csvfile:
+			
+			fieldnames = ['Cell Line', 'Image', 'Area', 'X', 'Y', 'Solidity', 'Circ.', 'Round', 'Perim.', 'Include', 'Distances']
+			writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', lineterminator = '\n')
+			if j == 0:
+				writer.writeheader()
+			for item in particles:
+				writer.writerow(item)
+
+		j += 1
 	i += 1
-
