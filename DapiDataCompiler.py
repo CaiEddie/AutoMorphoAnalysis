@@ -38,6 +38,15 @@ def findCroppedClusters( image, particles, width, height):
 
 	return clusters
 
+def findSizeThreshold ( image, particles, size):
+	"This locates all the clusters under a certain size"
+
+	clusters = [] 
+	for part in particles:
+		if float(part['Area']) < size: 
+			clusters.append(part)
+	return clusters
+
 def calculateDistance( ref, particles ):
 	"This calculates the distance between the reference cluster and all others, returning a list of distances"
 
@@ -103,15 +112,18 @@ while os.path.isdir(directory):
 			# marks the clusters that are near the edge
 
 			edgeClusters = findCroppedClusters(image, particles, 100, 100)
-
 			for item in edgeClusters:
 				item['Include'] = True
+
+			singleCells = findSizeThreshold(image, particles, 225)
+			for item in singleCells:
+				item['Single Cell'] = True
 
 #		os.remove(di+ "/particle_data_" + str(j) + ".csv")
 
 		with open(di + "/output.csv", 'a') as csvfile:
 			
-			fieldnames = ['Cell Line', 'Image', 'Area', 'X', 'Y', 'Solidity', 'Circ.', 'Round', 'Perim.', 'Include', 'Average Distance']
+			fieldnames = ['Cell Line', 'Image', 'Area', 'X', 'Y', 'Solidity', 'Circ.', 'Round', 'Perim.', 'Include', 'Single Cell', 'Average Distance']
 			writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', lineterminator = '\n')
 			if os.path.getsize(di + "/output.csv") < 1:
 				writer.writeheader()
