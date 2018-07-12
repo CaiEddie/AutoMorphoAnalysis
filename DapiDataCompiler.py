@@ -26,6 +26,19 @@ def findMiddleThree( image, particles ):
 
 	return first, second, third
 
+def circleCrop(image, particles, maxi ):
+	Cx = float(image['Width']) / 2 
+	Cy = float(image['Height']) / 2
+
+	clusters = []
+
+	for part in particles:
+		part['centerDistance'] = math.sqrt((Cx - float(part['X']))**2 + (Cy - float(part['Y'])) **2)
+		if part['centerDistance'] < maxi:
+			clusters.append(part)
+	return clusters
+
+
 def findCroppedClusters( image, particles, width, height):
 	"This locates all the clusters in a box cropped by width and height"
 
@@ -43,25 +56,26 @@ def findSizeThreshold ( image, particles, size):
 
 	clusters = [] 
 	for part in particles:
-		if float(part['Area']) < size: 
+		if float(part['Area']) > size: 
 			clusters.append(part)
 	return clusters
 
-def calculateDistance( ref, particles ):
+def calculateDistance( ref, particles, maxi):
 	"This calculates the distance between the reference cluster and all others, returning a list of distances"
 
 	distances = []
 	for part in particles:
 		if part != ref: 
 			distance =  math.sqrt((float(ref['X']) - float(part['X']))**2 + (float(ref['Y']) - float(part['Y'])) **2) 
-			distances.append(distance)
+			if distance < maxi:
+				distances.append(distance)
 
 	return distances
 
 
 #  Takes the directory from the macro 
 directory = getArgument()
-f = open(directory + "/output.csv", 'w')
+f = open(directory + "output.csv", 'w')
 f.close()
 i = 0
 j = 0
@@ -100,14 +114,6 @@ while os.path.isdir(directory):
 				item['Image'] = j
 				item['Cell Line'] = chr(ord('A')+i)
 
-			references = findMiddleThree(image, particles)
-
-			for ref in references:
-				if ref:
-					distances = calculateDistance(ref, particles)
-					ref['Distances'] = distances
-					if len(distances) > 0:
-						ref['Average Distance'] = sum(distances) / len(distances)
 
 			# marks the clusters that are near the edge
 
@@ -115,15 +121,23 @@ while os.path.isdir(directory):
 			for item in edgeClusters:
 				item['Include'] = True
 
-			singleCells = findSizeThreshold(image, particles, 225)
-			for item in singleCells:
-				item['Single Cell'] = True
+			nuclei = findSizeThreshold(image, particles, 250)
+			for item in nuclei:
+				item['Cluster'] = True
+
+			middleCLusters = circleCrop(image, nuclei, 0.35*float(image['Width']))
+			for ref in middleCLusters:
+				if ref:
+					distances = calculateDistance(ref, nuclei, 300)
+					if len(distances) > 0:
+						ref['Average Distance'] = sum(distances) / len(distances)
+						ref['# of clusters in radius'] = len(distances)
 
 #		os.remove(di+ "/particle_data_" + str(j) + ".csv")
 
-		with open(di + "/output.csv", 'a') as csvfile:
+		with open(directory + "/output.csv", 'a') as csvfile:
 			
-			fieldnames = ['Cell Line', 'Image', 'Area', 'X', 'Y', 'Solidity', 'Circ.', 'Round', 'Perim.', 'Include', 'Single Cell', 'Average Distance']
+			fieldnames = ['', 'Cell Line', 'Image', 'Area', 'X', 'Y', 'Solidity', 'Circ.', 'Round', 'Perim.', 'Include', 'Cluster', 'Average Distance', '# of clusters in radius']
 			writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', lineterminator = '\n')
 			if os.path.getsize(di + "/output.csv") < 1:
 				writer.writeheader()

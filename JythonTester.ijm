@@ -11,7 +11,7 @@ output = File.getParent(getInfo("macro.filepath")) + "/results/"
 
 // runs the python script
 
-jythonText = File.openAsString(File.getParent(getInfo("macro.filepath")) + "/DataCompiler2.py"); 
+jythonText = File.openAsString(File.getParent(getInfo("macro.filepath")) + "/DapiDataCompiler.py"); 
 call("ij.plugin.Macro_Runner.runPython", jythonText, output); 
 
 waitForUser("Finished!", "Analysis Complete!");

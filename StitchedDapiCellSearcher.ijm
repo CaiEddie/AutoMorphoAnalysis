@@ -1,11 +1,9 @@
 // Written by Robert Oda & Vince Soubannier
 
 
-function action(input, output, i)
+function action(input, output, filename)
 {	
-//		open(input + filename);
-		open(File.openDialog("Please select stitched DAPI channel image"))
-		filename = getInfo("window.title");
+		open(input + filename);
 		setOption("BlackBackground", true);
 		run("Properties...", "channels=1 slices=1 frames=1 unit=µm pixel_width=0.4318000 pixel_height=0.4318000 voxel_depth=25400.0510000");
 		run("8-bit");
@@ -54,18 +52,17 @@ function action(input, output, i)
 			run("Close");
 }
 
-// input = getFile("Choose Input Directory");
+input = getDirectory("Choose Input Directory");
 
 output = File.getParent(getInfo("macro.filepath")) + "/results/"
 
 //setBatchMode(true);
-//list = getFileList(input);
-//for (i = 0; i < list.length; i++)
-//{
-	input = "";
-	i = 0;
-	action(input, output, i);
-//}
+list = getFileList(input);
+for (i = 0; i < list.length; i++)
+{
+	action(input, output, list[i]);
+}
+
 
 // runs the python script
 
