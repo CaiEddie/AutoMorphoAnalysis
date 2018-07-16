@@ -51,14 +51,38 @@ def findCroppedClusters( image, particles, width, height):
 
 	return clusters
 
-def findSizeThreshold ( image, particles, size):
+def findSizeThreshold ( image, particles, mini, maxi):
 	"This locates all the clusters under a certain size"
 
 	clusters = [] 
 	for part in particles:
-		if float(part['Area']) > size: 
+		if float(part['Area']) > mini and float(part['Area']) < maxi: 
 			clusters.append(part)
 	return clusters
+
+def threeClosest( ref, particles):
+	"This calculates the distance between the reference cluster and the three closest ones, returning a list of distances"
+
+	distances = []
+	first = sys.maxsize
+	second = sys.maxsize
+	third = sys.maxsize
+	for part in particles:
+		if part != ref: 
+			distance =  math.sqrt((float(ref['X']) - float(part['X']))**2 + (float(ref['Y']) - float(part['Y'])) **2) 
+			if distances != 0:
+				if distance < first:
+					third = second
+					second = first 
+					first = distance
+				elif distance < second:
+					third = second
+					second = distance 
+				elif distance < third:
+					third = distance 
+
+	distances = [first, second, third]
+	return distances
 
 def calculateDistance( ref, particles, maxi):
 	"This calculates the distance between the reference cluster and all others, returning a list of distances"
@@ -67,7 +91,7 @@ def calculateDistance( ref, particles, maxi):
 	for part in particles:
 		if part != ref: 
 			distance =  math.sqrt((float(ref['X']) - float(part['X']))**2 + (float(ref['Y']) - float(part['Y'])) **2) 
-			if distance < maxi:
+			if distance < maxi and distance != 0:
 				distances.append(distance)
 
 	return distances
@@ -117,11 +141,11 @@ while os.path.isdir(directory):
 
 			# marks the clusters that are near the edge
 
-			edgeClusters = findCroppedClusters(image, particles, 100, 100)
+			edgeClusters = findCroppedClusters(image, particles, 50, 50)
 			for item in edgeClusters:
 				item['Include'] = True
 
-			nuclei = findSizeThreshold(image, particles, 250)
+			nuclei = findSizeThreshold(image, edgeClusters, 500, 150000)
 			for item in nuclei:
 				item['Cluster'] = True
 
@@ -132,12 +156,15 @@ while os.path.isdir(directory):
 					if len(distances) > 0:
 						ref['Average Distance'] = sum(distances) / len(distances)
 						ref['# of clusters in radius'] = len(distances)
+					distances = threeClosest(ref, nuclei)
+					if len(distances) > 0:
+						ref['Average Distance (3 closest)'] = sum(distances) / len(distances)
 
 #		os.remove(di+ "/particle_data_" + str(j) + ".csv")
 
 		with open(directory + "/output.csv", 'a') as csvfile:
 			
-			fieldnames = ['', 'Cell Line', 'Image', 'Area', 'X', 'Y', 'Solidity', 'Circ.', 'Round', 'Perim.', 'Include', 'Cluster', 'Average Distance', '# of clusters in radius']
+			fieldnames = ['', 'Cell Line', 'Image', 'Area', 'X', 'Y', 'Solidity', 'Circ.', 'Round', 'Perim.', 'Include', 'Cluster','# of clusters in radius', 'Average Distance',  'Average Distance (3 closest)']
 			writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', lineterminator = '\n')
 			if os.path.getsize(di + "/output.csv") < 1:
 				writer.writeheader()

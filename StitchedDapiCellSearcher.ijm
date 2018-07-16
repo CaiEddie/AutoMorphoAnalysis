@@ -24,11 +24,12 @@ function action(input, output, filename)
 		selectWindow("duplicate");
 		setAutoThreshold("Default dark");
 		run("Threshold...");
-		setThreshold(10, 255);
+		setThreshold(13, 255);
 		setOption("BlackBackground", true);
 		run("Convert to Mask");
+
 		run("Set Measurements...", "area centroid perimeter shape redirect=None decimal=3");
-		run("Analyze Particles...", "circularity=0.12-1.00 size=250-Infinity pixel display clear summarize add in_situ");
+		run("Analyze Particles...", "circularity=0.00-1.00 size=450-Infinity pixel display clear summarize add in_situ");
 			selectWindow("duplicate");
 			close();
 
