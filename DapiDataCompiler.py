@@ -154,17 +154,19 @@ while os.path.isdir(directory):
 				if ref:
 					distances = calculateDistance(ref, nuclei, 300)
 					if len(distances) > 0:
+						ref['Distances'] = distances 
 						ref['Average Distance'] = sum(distances) / len(distances)
-						ref['# of clusters in radius'] = len(distances)
+						ref['# of other clusters in radius'] = len(distances)
 					distances = threeClosest(ref, nuclei)
 					if len(distances) > 0:
+						ref['Distances (3 closest)'] = distances
 						ref['Average Distance (3 closest)'] = sum(distances) / len(distances)
 
 #		os.remove(di+ "/particle_data_" + str(j) + ".csv")
 
 		with open(directory + "/output.csv", 'a') as csvfile:
 			
-			fieldnames = ['', 'Cell Line', 'Image', 'Area', 'X', 'Y', 'Solidity', 'Circ.', 'Round', 'Perim.', 'Include', 'Cluster','# of clusters in radius', 'Average Distance',  'Average Distance (3 closest)']
+			fieldnames = ['', 'Cell Line', 'Image', 'Area', 'X', 'Y', 'Solidity', 'Circ.', 'Round', 'Perim.', 'Include', 'Cluster','# of other clusters in radius', 'Distances' 'Average Distance', 'Distances (3 closest)', 'Average Distance (3 closest)']
 			writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', lineterminator = '\n')
 			if os.path.getsize(di + "/output.csv") < 1:
 				writer.writeheader()
