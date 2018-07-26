@@ -166,7 +166,7 @@ while os.path.isdir(directory):
 
 		with open(directory + "/output.csv", 'a') as csvfile:
 			
-			fieldnames = ['', 'Cell Line', 'Image', 'Area', 'X', 'Y', 'Solidity', 'Circ.', 'Round', 'Perim.', 'Include', 'Cluster','# of other clusters in radius', 'Distances' 'Average Distance', 'Distances (3 closest)', 'Average Distance (3 closest)']
+			fieldnames = ['', 'Cell Line', 'Image', 'Area', 'X', 'Y', 'Solidity', 'Circ.', 'Round', 'Perim.', 'Include', 'Cluster','# of other clusters in radius', 'Distances', 'Average Distance', 'Distances (3 closest)', 'Average Distance (3 closest)']
 			writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', lineterminator = '\n')
 			if os.path.getsize(di + "/output.csv") < 1:
 				writer.writeheader()
