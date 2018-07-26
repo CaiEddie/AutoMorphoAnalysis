@@ -48,11 +48,11 @@ function action(input, output, filename)
 
 		// This macro draws the Feret diameter of the current selection.
 
-		List.setMeasurements;
-		x1 = List.getValue("FeretX");
-		y1 = List.getValue("FeretY");
-		length = List.getValue("Feret");
-		degrees = List.getValue("FeretAngle");
+		selectWindow("Results");
+		x1 = getResult("FeretX");
+		y1 = getResult("FeretY");
+		length = getResult("Feret");
+		degrees = getResult("FeretAngle");
 		if (degrees>90) {
 			degrees -= 180; 
 		}
@@ -60,9 +60,11 @@ function action(input, output, filename)
 		x2 = x1 + cos(angle)*length;
 		y2 = y1 - sin(angle)*length;
 		setColor("red");
-		Overlay.drawLine(x1, y1, x2, y2);
+		Overlay.drawLine(x1*2.2272, y1*2.2272, x2*2.2272, y2*2.2272);
 		Overlay.show();
 		showStatus("angle="+degrees);
+
+		selectWindow(filename);
 
 			saveAs("Jpeg", output + "output_" + j + ".jpg");
 					
