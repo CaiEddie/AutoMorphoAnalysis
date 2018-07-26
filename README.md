@@ -1,12 +1,12 @@
 # AutoMorphoAnalysis
 Several scripts to help automate data analysis
 
-1. Mature culture morphology: An image J program to detect clusters of cells in motor neuron cultures.
-a) detect clusters in phase-contrast images
-B) detect clusters from dapi images in a stitched image from the center of a 24 well plate
+1. Mature culture morphology: An image J macro to detect clusters of cells in motor neuron cultures.
+a) detect clusters in phase-contrast images ( ClusterSearcher.ijm )
+B) detect clusters from dapi images in a stitched image from the center of a 24 well plate ( StitchedDapiCellSearcher.ijm )
       -single cells will also be detected and counted, this is still under construction.
 c) pythonsampler - measures distances between clusters in a radius and the nearest three clusters for
-defined region of reference clusters.
+defined region of reference clusters. (DataCompiler.py / DapiDataCompiler.py, automatically run from macros with jython)
 d) Soon to be determined - summary statistics and modeling of the data
 
 2. Cell detection at the start of motor neuron cultures (NPCs)
@@ -38,7 +38,7 @@ This will need at least separate detection methods -
 5. Organoid measurer: 
       - renamer is for these files - the images can be aquired by folder and then renamed so that
       the experimenter doesn't have to constantly type in the line name.  This would be good for all EVOS
-      files.
+      files. (file_renamer.py)
       a) phase images of organoids - simply detect sphere and measure diameter, roundness
       b) compile data creating a dataframe that will also include the day/age of the organoid
       c) summary data - average size per day of organoid by line - variation - There are usually 12 images
