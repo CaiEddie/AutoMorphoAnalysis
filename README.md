@@ -2,8 +2,8 @@
 Several scripts to help automate data analysis
 
 1. Mature culture morphology: An image J macro to detect clusters of cells in motor neuron cultures.
-a) detect clusters in phase-contrast images ( ClusterSearcher.ijm )
-B) detect clusters from dapi images in a stitched image from the center of a 24 well plate ( StitchedDapiCellSearcher.ijm )
+a) detect clusters in phase-contrast images (ClusterSearcher.ijm)
+b) detect clusters from dapi images in a stitched image from the center of a 24 well plate (StitchedDapiCellSearcher.ijm)
       -single cells will also be detected and counted, this is still under construction.
 c) pythonsampler - measures distances between clusters in a radius and the nearest three clusters for
 defined region of reference clusters. (DataCompiler.py / DapiDataCompiler.py, automatically run from macros with jython)
