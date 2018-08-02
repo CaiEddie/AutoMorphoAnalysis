@@ -18,34 +18,39 @@ function action(input, output, filename)
 
 		mean = getResult("Mean", 0);
 		std = getResult("StdDev", 0);
-		run("Size...", "width="+ getResult("Width")/3 + " height=" + getResult("Height")/3 + " constrain average interpolation=Bilinear");
-		run("Duplicate...", "title=duplicate");
 		run("Enhance Contrast", "saturated=0.35");
 		run("Apply LUT");
-		selectWindow("duplicate");
 		setAutoThreshold("Default dark");
 		run("Threshold...");
-		setThreshold(20000, 65535);
+		setThreshold(14000, 65535);
 		waitForUser("Pause","Adjust threshold");
 		setOption("BlackBackground", true);
 		run("Convert to Mask");
 
-		run("Fill Holes");
-		run("Gray Morphology", "radius=2 type=circle operator=open");
-		run("Gray Morphology", "radius=3 type=circle operator=close");
+		run("Watershed");
 
 		run("Set Measurements...", "area centroid perimeter shape redirect=None decimal=3");
-		run("Analyze Particles...", "circularity=0.00-1.00 size=500-Infinity display clear summarize add in_situ");
-			selectWindow("duplicate");
-			close();
+		run("Analyze Particles...", "circularity=0.00-1.00 size=20-Infinity display clear summarize add in_situ");
+		close();
 
-		// Adds the Regions of Interest back into the original picture and saves it in new directory
+		// Adds the Regions of Interest back into the other channel and measure the area difference
 
+		filename2 = replace(filename, "d0", "d1");
+		open(input + filename2);
+
+			run("Threshold...");
+			setThreshold(200, 65535);
+			waitForUser("Pause","Adjust threshold");
 
 			if (roiManager("count") > 0) {
 				roiManager("Set Line Width", 1);
 				run("From ROI Manager");
 			}
+
+			selectWindow("Results");
+			run("Close");
+			run("Set Measurements...", "area mean centroid perimeter shape feret's area_fraction redirect=None decimal=3");
+			roiManager("Measure");
 			saveAs("Jpeg", output + "output_" + i + ".jpg");
 					
 		// Closes everything and saves the particle data file
@@ -68,15 +73,21 @@ output = File.getParent(getInfo("macro.filepath")) + "/results/"
 
 //setBatchMode(true);
 list = getFileList(input);
-for (i = 0; i < list.length; i++)
+i = 0;
+for (j = 0; j < list.length; j++)
 {
-	action(input, output, list[i]);
+	if (endsWith(list[j], "d0.TIF"))
+	{
+		action(input, output, list[j]);
+		i++;
+	}
+
 }
 
 
 // runs the python script
 
-jythonText = File.openAsString(File.getParent(getInfo("macro.filepath")) + "/DapiDataCompiler.py"); 
+jythonText = File.openAsString(File.getParent(getInfo("macro.filepath")) + "/StitchedDataCompiler.py"); 
 call("ij.plugin.Macro_Runner.runPython", jythonText, output); 
 
 waitForUser("Finished!", "Analysis Complete!");
