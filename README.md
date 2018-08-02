@@ -25,21 +25,21 @@ This will need at least separate detection methods -
       
 4. Quantify how much of MN culture is really motor neurons. 
     This could be done with stitched images but the files might be too big. We can run a batch of the separate images.
-      1. Colocalization of motor neuron markers with cells and clusters
+      1. Colocalization of motor neuron markers with cells and clusters (StitchedColocalization.ijm)
             - Define clusters using dapi, mask MN marker and calculate 
                   - the area of the cluster marked
                   - the number of clusters marked (I think this will be all of them)
             - Define single cells with a region outside dapi or just the dapi area (if the MN is nuclear)
                   - measure number of posistive single cells
       2. python script to compile meaurments calculate percent area of MN markers in clusters
-      percent of single cells with MN staining.
+      percent of single cells with MN staining. 
                     
                     
 5. Organoid measurer: 
       - renamer is for these files - the images can be aquired by folder and then renamed so that
       the experimenter doesn't have to constantly type in the line name.  This would be good for all EVOS
       files. (file_renamer.py)
-      1. phase images of organoids - simply detect sphere and measure diameter, roundness
+      1. phase images of organoids - simply detect sphere and measure diameter, roundness (OrganoidSearcher.ijm)
       2. compile data creating a dataframe that will also include the day/age of the organoid
       3. summary data - average size per day of organoid by line - variation - There are usually 12 images
       per line per batch
