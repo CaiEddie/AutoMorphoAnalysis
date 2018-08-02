@@ -30,7 +30,7 @@ function action(input, output, filename)
 
 		run("Gray Morphology", "radius=5 type=circle operator=close");
 		run("Fill Holes");
-
+		run("Watershed");
 
 		run("Set Measurements...", "area centroid perimeter shape feret's redirect=None decimal=3");
 		run("Analyze Particles...", "circularity=0.00-1.00 size=30000-Infinity display clear summarize add in_situ");
@@ -105,7 +105,7 @@ for (i = 0; i < list.length; i++)
 
 // runs the python script
 
-jythonText = File.openAsString(File.getParent(getInfo("macro.filepath")) + "/DapiDataCompiler.py"); 
+jythonText = File.openAsString(File.getParent(getInfo("macro.filepath")) + "/OrganoidDataCompiler.py"); 
 call("ij.plugin.Macro_Runner.runPython", jythonText, output); 
 
 waitForUser("Finished!", "Analysis Complete!");
