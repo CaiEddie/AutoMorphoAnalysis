@@ -1,3 +1,5 @@
+# Written by Eddie Cai
+
 import csv
 import os.path
 import math

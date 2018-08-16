@@ -87,7 +87,7 @@ for (j = 0; j < list.length; j++)
 
 // runs the python script
 
-jythonText = File.openAsString(File.getParent(getInfo("macro.filepath")) + "/StitchedDataCompiler.py"); 
+jythonText = File.openAsString(File.getParent(getInfo("macro.filepath")) + "/ColocalizationDataCompiler.py"); 
 call("ij.plugin.Macro_Runner.runPython", jythonText, output); 
 
 waitForUser("Finished!", "Analysis Complete!");

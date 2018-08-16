@@ -1,3 +1,5 @@
+# Written by Eddie Cai
+
 import csv
 import os.path
 import math
@@ -73,13 +75,13 @@ def threeClosest( ref, particles):
 			if distances != 0:
 				if distance < first:
 					third = second
-					second = first 
+					second = first
 					first = distance
 				elif distance < second:
 					third = second
-					second = distance 
+					second = distance
 				elif distance < third:
-					third = distance 
+					third = distance
 
 	distances = [first, second, third]
 	return distances
