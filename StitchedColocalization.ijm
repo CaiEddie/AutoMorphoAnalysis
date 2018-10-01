@@ -18,6 +18,27 @@ function action(input, output, filename)
 
 		mean = getResult("Mean", 0);
 		std = getResult("StdDev", 0);
+
+		run("Duplicate...", "title=duplicate");
+		run("Enhance Contrast", "saturated=0.35");
+		run("Apply LUT");
+		selectWindow("duplicate");
+		setAutoThreshold("Default dark");
+		run("Threshold...");
+		setThreshold(20000, 65535);
+		waitForUser("Pause","Adjust threshold");
+		setOption("BlackBackground", true);
+		run("Convert to Mask");
+
+		run("Fill Holes");
+
+		run("Set Measurements...", "area centroid perimeter shape redirect=None decimal=3");
+		run("Analyze Particles...", "circularity=0.00-1.00 size=500-Infinity display clear summarize add in_situ");
+			selectWindow("duplicate");
+			close();
+
+		selectWindow(filename);
+
 		run("Enhance Contrast", "saturated=0.35");
 		run("Apply LUT");
 		setAutoThreshold("Default dark");
@@ -27,8 +48,19 @@ function action(input, output, filename)
 		setOption("BlackBackground", true);
 		run("Convert to Mask");
 
-		run("Watershed");
 
+		//eventually loop through and resize each 
+			for (m = 0; m < roiManager("count"); m++){ 
+
+				selectWindow(filename); 
+				roiManager("Select", m);
+				run("Scale... ", "x=1.2 y=1.2 centered");
+				setForegroundColor(0, 0, 0);
+				run("Fill", "slice");
+			} 
+		roiManager("reset");
+		run("Select All");
+		run("Watershed");
 		run("Set Measurements...", "area centroid perimeter shape redirect=None decimal=3");
 		run("Analyze Particles...", "circularity=0.00-1.00 size=20-Infinity display clear summarize add in_situ");
 		close();
@@ -37,7 +69,7 @@ function action(input, output, filename)
 
 		filename2 = replace(filename, "d0", "d1");
 		open(input + filename2);
-
+		run("Properties...", "channels=1 slices=1 frames=1 unit=µm pixel_width=0.4318000 pixel_height=0.4318000 voxel_depth=25400.0510000");
 			run("Threshold...");
 			setThreshold(200, 65535);
 			waitForUser("Pause","Adjust threshold");
@@ -46,6 +78,7 @@ function action(input, output, filename)
 				roiManager("Set Line Width", 1);
 				run("From ROI Manager");
 			}
+
 
 			selectWindow("Results");
 			run("Close");
@@ -58,6 +91,29 @@ function action(input, output, filename)
 			run("Close All");
 			selectWindow("Results");
 			saveAs("Results", output + "particle_data_" + i + ".csv");
+			run("Close");
+
+
+		filename3 = replace(filename, "d0", "d2");
+		open(input + filename3);
+		run("Properties...", "channels=1 slices=1 frames=1 unit=µm pixel_width=0.4318000 pixel_height=0.4318000 voxel_depth=25400.0510000");
+			run("Threshold...");
+			setThreshold(300, 65535);
+			waitForUser("Pause","Adjust threshold");
+
+			if (roiManager("count") > 0) {
+				roiManager("Set Line Width", 1);							//try multimeasure
+				run("From ROI Manager");
+			}
+			run("Set Measurements...", "area mean centroid perimeter shape feret's area_fraction redirect=None decimal=3");
+			roiManager("Measure");
+			saveAs("Jpeg", output + "output2_" + i + ".jpg");
+					
+		// Closes everything and saves the particle data file
+				
+			run("Close All");
+			selectWindow("Results");
+			saveAs("Results", output + "particle_data2_" + i + ".csv");
 			run("Close");
 			selectWindow("Summary");
 			run("Close");

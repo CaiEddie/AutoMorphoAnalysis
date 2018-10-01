@@ -27,6 +27,7 @@ def findMiddleThree( image, particles ):
 	return first, second, third
 
 def circleCrop(image, particles, maxi ):
+	"This rerturns the particles that are within a centered circle with radius maxi"
 	Cx = float(image['Width']) / 2 
 	Cy = float(image['Height']) / 2
 
@@ -73,13 +74,13 @@ def threeClosest( ref, particles):
 			if distances != 0:
 				if distance < first:
 					third = second
-					second = first 
+					second = first
 					first = distance
 				elif distance < second:
 					third = second
-					second = distance 
+					second = distance
 				elif distance < third:
-					third = distance 
+					third = distance
 
 	distances = [first, second, third]
 	return distances

@@ -29,6 +29,7 @@ def findMiddleThree( image, particles ):
 	return first, second, third
 
 def circleCrop(image, particles, maxi ):
+	"This rerturns the particles that are within a centered circle with radius maxi"
 	Cx = float(image['Width']) / 2 
 	Cy = float(image['Height']) / 2
 
@@ -108,6 +109,7 @@ j = 0
 
 #  Loops through the csv files (with precise naming) if they exist 
 
+
 while os.path.isdir(directory):
 	di = directory 
 	while os.path.isfile(di+ "/particle_data_" + str(j) + ".csv"):
@@ -140,12 +142,17 @@ while os.path.isdir(directory):
 				item['Image'] = j
 				item['Cell Line'] = chr(ord('A')+i)
 
+			middleClusters = circleCrop(image, particles, 0.35*float(image['Width']))
+			for ref in middleClusters:
+				if ref:
+					ref['Crop'] = True
+
 
 #		os.remove(di+ "/particle_data_" + str(j) + ".csv")
 
 		with open(directory + "/output.csv", 'a') as csvfile:
 			
-			fieldnames = ['', 'Cell Line', 'Image', 'Area', 'X', 'Y', 'Solidity', 'Circ.', 'Round', 'Perim.', '%Area']
+			fieldnames = ['', 'Cell Line', 'Image', 'Area', 'X', 'Y', 'Solidity', 'Circ.', 'Round', 'Perim.', '%Area', 'Crop']
 			writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', lineterminator = '\n')
 			if os.path.getsize(di + "/output.csv") < 1:
 				writer.writeheader()

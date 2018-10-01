@@ -28,7 +28,7 @@ function action(input, output, filename)
 
 		run("Invert");
 
-		run("Gray Morphology", "radius=5 type=circle operator=close");
+		run("Gray Morphology", "radius=5 type=circle operator=open");
 		run("Fill Holes");
 		run("Watershed");
 
