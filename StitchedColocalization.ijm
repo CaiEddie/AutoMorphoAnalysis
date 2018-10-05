@@ -26,7 +26,7 @@ function action(input, output, filename)
 		setAutoThreshold("Default dark");
 		run("Threshold...");
 		setThreshold(20000, 65535);
-		waitForUser("Pause","Adjust threshold");
+//		waitForUser("Pause","Adjust threshold");
 		setOption("BlackBackground", true);
 		run("Convert to Mask");
 
@@ -72,7 +72,7 @@ function action(input, output, filename)
 		run("Properties...", "channels=1 slices=1 frames=1 unit=µm pixel_width=0.4318000 pixel_height=0.4318000 voxel_depth=25400.0510000");
 			run("Threshold...");
 			setThreshold(200, 65535);
-			waitForUser("Pause","Adjust threshold");
+//			waitForUser("Pause","Adjust threshold");
 
 			if (roiManager("count") > 0) {
 				roiManager("Set Line Width", 1);
@@ -99,7 +99,7 @@ function action(input, output, filename)
 		run("Properties...", "channels=1 slices=1 frames=1 unit=µm pixel_width=0.4318000 pixel_height=0.4318000 voxel_depth=25400.0510000");
 			run("Threshold...");
 			setThreshold(300, 65535);
-			waitForUser("Pause","Adjust threshold");
+//			waitForUser("Pause","Adjust threshold");
 
 			if (roiManager("count") > 0) {
 				roiManager("Set Line Width", 1);							//try multimeasure

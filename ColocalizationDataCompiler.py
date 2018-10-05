@@ -110,7 +110,7 @@ j = 0
 #  Loops through the csv files (with precise naming) if they exist 
 
 
-while os.path.isdir(directory):
+if os.path.isdir(directory):
 	di = directory 
 	while os.path.isfile(di+ "/particle_data_" + str(j) + ".csv"):
 
@@ -155,6 +155,69 @@ while os.path.isdir(directory):
 			fieldnames = ['', 'Cell Line', 'Image', 'Area', 'X', 'Y', 'Solidity', 'Circ.', 'Round', 'Perim.', '%Area', 'Crop']
 			writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', lineterminator = '\n')
 			if os.path.getsize(di + "/output.csv") < 1:
+				writer.writeheader()
+			for item in particles:
+				writer.writerow(item)
+
+		j += 1
+
+
+#### ____________________________REPEAT FOR D1______________________________ ####
+#################################################################################
+
+f = open(directory + "output2.csv", 'w')
+f.close()
+i = 0
+j = 0
+
+#  Loops through the csv files (with precise naming) if they exist 
+
+
+if os.path.isdir(directory):
+	di = directory 
+	while os.path.isfile(di+ "/particle_data2_" + str(j) + ".csv"):
+
+
+		# opens the measurement data file and adds the information to the 'image' dictionary 
+		#	'Mean' 'StdDev'	'Min' 'Max'	'Witdh'	'Height'
+
+		with open(di + "/measure_data_" + str(j) + ".csv") as mfile:
+			reader = csv.DictReader(mfile, delimiter=',')
+			for index in reader:
+				image = index
+
+#		os.remove(di+ "/measure_data_" + str(j) + ".csv")
+		# opens the particle data file and adds the information to the 'particles' dictionary table  
+		#	'Area' 'X' 'Y' 'Perim.'	'Circ' 'AR'	'Round'	'Solidity'
+		
+		with open(di + "/particle_data2_" + str(j) + ".csv", 'rb') as pfile:
+			buf = csv.DictReader(pfile, delimiter=',')
+
+			# writing all of the particle data into dictionary list "particles"
+
+			particles = []
+			count = 0
+			for row in buf:
+				particles.append(row)
+				count += 1
+
+			for item in particles:
+				item['Image'] = j
+				item['Cell Line'] = chr(ord('A')+i)
+
+			middleClusters = circleCrop(image, particles, 0.35*float(image['Width']))
+			for ref in middleClusters:
+				if ref:
+					ref['Crop'] = True
+
+
+#		os.remove(di+ "/particle_data_" + str(j) + ".csv")
+
+		with open(directory + "/output2.csv", 'a') as csvfile:
+			
+			fieldnames = ['', 'Cell Line', 'Image', 'Area', 'X', 'Y', 'Solidity', 'Circ.', 'Round', 'Perim.', '%Area', 'Crop']
+			writer = csv.DictWriter(csvfile, fieldnames=fieldnames, extrasaction='ignore', lineterminator = '\n')
+			if os.path.getsize(di + "/output2.csv") < 1:
 				writer.writeheader()
 			for item in particles:
 				writer.writerow(item)
